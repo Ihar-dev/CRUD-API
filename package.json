@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "main": "./app/main.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "cd app && node main.js",
+    "dev": "npm-run-all --parallel watch:server watch:build",
+    "watch:build": "webpack --mode production --watch",
+    "watch:server": "nodemon ./app/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,6 +33,8 @@
   "dependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "D": "^1.0.0",
-    "eslint-config-airbnb-base": "^15.0.0"
+    "eslint-config-airbnb-base": "^15.0.0",
+    "nodemon": "^2.0.16",
+    "npm-run-all": "^4.1.5"
   }
 }
