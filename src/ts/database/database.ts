@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 type userType = {
   id: string,
   username: string,
@@ -13,11 +15,28 @@ export class DataBase {
   }
 
   public addUser(): userType {
-    return {
-      id: '',
+    const id = this.getId();
+    const user = {
+      id,
       username: '',
       age: 0,
       hobbies: [],
+    };
+    this.users.push(user);
+    return user;
+  }
+
+  private getId(): string {
+    let id = '';
+    let isUnique = false;
+    while (!isUnique) {
+      id = uuidv4();
+      let found = false;
+      this.users.forEach(el => {
+        if (el.id === id) found = true;
+      });
+      if (!found) isUnique = true;
     }
+    return id;
   }
 }
