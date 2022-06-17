@@ -1,20 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 
-type userType = {
-  id: string,
-  username: string,
-  age: number,
-  hobbies: string[],
-}
+import { userType } from '../models/user.model';
 
 export class DataBase {
   public readonly users: userType[] = [];
 
-  public getUsers(): userType[] {
-    return this.users;
+  public async getUsers(): Promise < userType[] > {
+    return this.users; 
   }
 
-  public addUser(): userType {
+  public async addUser(): Promise < userType > {
     const id = this.getId();
     const user = {
       id,
