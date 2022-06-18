@@ -9,19 +9,14 @@ export class DataBase {
     return this.users; 
   }
 
-  public async addUser(): Promise < userType > {
-    const id = this.getId();
-    const user = {
-      id,
-      username: '',
-      age: 0,
-      hobbies: [],
-    };
-    this.users.push(user);
+  public async createUser(newUser: userType): Promise < userType > {
+    const user: userType = newUser;
+    user.id = this.createId();
+    this.users.push(newUser);
     return user;
   }
 
-  private getId(): string {
+  private createId(): string {
     let id = '';
     let isUnique = false;
     while (!isUnique) {

@@ -2,7 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import 'dotenv/config';
 
 import { DataBase } from './database/database';
-import { getUsers, addUser } from './controllers/user-controller';
+import { getUsers, createUser } from './controllers/user-controller';
 
 const database = new DataBase(); 
 const PORT = Number(process.env.PORT);
@@ -13,7 +13,7 @@ const requestHandler = (request: IncomingMessage, response: ServerResponse) => {
   const { method, url } = request;
   if (method && url) {
     if (method === 'GET' && url === '/api/users') getUsers(response, database);
-    else if (method === 'POST' && url === '/api/users') addUser(response, database);
+    else if (method === 'POST' && url === '/api/users') createUser(request, response, database);
     else {
       const outputContent = JSON.stringify({message: ROUTE_ERROR_MESSAGE});
       const outputStatusCode = 404;
