@@ -10,7 +10,7 @@ export class DataBase {
   }
 
   public async createUser(newUser: userType): Promise < userType > {
-    const user: userType = newUser;
+    const user: userType = JSON.parse(JSON.stringify(newUser));
     user.id = this.createId();
     this.users.push(newUser);
     return user;
