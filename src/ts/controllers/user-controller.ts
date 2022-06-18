@@ -3,6 +3,8 @@ import { ServerResponse } from 'http';
 import { DataBase } from '../database/database';
 import { userType } from '../models/user.model';
 
+const ERROR_MESSAGE = 'Internal Server Error';
+
 const sendAnswer = (response: ServerResponse, outputStatusCode: number, outputContent: string) => {
   response.writeHead(outputStatusCode, {'Content-Type': 'application/json'});
   response.end(outputContent);
@@ -16,7 +18,7 @@ export const getUsers = async (response: ServerResponse, database: DataBase) => 
     outputContent = JSON.stringify(users);
     outputStatusCode = 200;
   } catch (err) {
-    outputContent = JSON.stringify({message: 'Errors on the server side'});
+    outputContent = JSON.stringify({message: ERROR_MESSAGE});
     outputStatusCode = 500;
   }
   sendAnswer(response, outputStatusCode, outputContent);
@@ -30,7 +32,7 @@ export const addUser = async (response: ServerResponse, database: DataBase) => {
     outputContent = JSON.stringify(user);
     outputStatusCode = 201;
   } catch (err) {
-    outputContent = JSON.stringify({message: 'Errors on the server side'});
+    outputContent = JSON.stringify({message: ERROR_MESSAGE});
     outputStatusCode = 500;
   }
   sendAnswer(response, outputStatusCode, outputContent);
