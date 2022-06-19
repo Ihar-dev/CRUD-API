@@ -35,6 +35,14 @@ export class DataBase {
     return updatedUser;
   }
 
+  public async deleteUser(userToDelete: userType): Promise < void > {
+    let foundIndex: number | null = null;
+    this.users.forEach((user, index) => {
+      if (user.id === userToDelete.id) foundIndex = index;
+    });
+    if (foundIndex) this.users.splice(foundIndex, 1);
+  }
+
   private createId(): string {
     let id = '';
     let isUnique = false;

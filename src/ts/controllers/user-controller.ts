@@ -137,3 +137,30 @@ export const updateSingleUser = async (request: IncomingMessage, response: Serve
     sendAnswer(response, outputStatusCode, outputContent);
   }
 }
+
+// @desc Deletes a User
+// @route DELETE /api/users/:id
+export const deleteSingleUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase, id: string) => {
+  let outputContent = '';
+  let outputStatusCode: number = 0;
+  try {
+    if (uuidValidate(id)) {
+      const user: userType = await database.findUser(id);
+      if (user.id) {
+        await database.deleteUser(user);
+        outputContent = JSON.stringify('');
+        outputStatusCode = 204;
+      } else {
+        outputContent = JSON.stringify({message: USER_ERROR_MESSAGE});
+        outputStatusCode = 404;
+      }
+    } else {
+      outputContent = JSON.stringify({message: UUID_ERROR_MESSAGE});
+      outputStatusCode = 400;
+    }
+  } catch (err) {
+    outputContent = JSON.stringify({message: SERVER_ERROR_MESSAGE});
+    outputStatusCode = 500;
+  }
+  sendAnswer(response, outputStatusCode, outputContent);
+}
