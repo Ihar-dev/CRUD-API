@@ -21,7 +21,7 @@ const requestHandler = (request: IncomingMessage, response: ServerResponse) => {
       updateSingleUser(request, response, database, id);
     } else if (method === 'DELETE' && url.match(/\/api\/users\/([0-9a-zA-Z-]+)/)) {
       const id = url.split('/')[3];
-      deleteSingleUser(request, response, database, id);
+      deleteSingleUser(response, database, id);
     } else if (method === 'POST' && url === '/api/users') createUser(request, response, database);
     else {
       const outputContent = JSON.stringify({message: ROUTE_ERROR_MESSAGE});

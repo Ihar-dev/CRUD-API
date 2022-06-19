@@ -140,7 +140,7 @@ export const updateSingleUser = async (request: IncomingMessage, response: Serve
 
 // @desc Deletes a User
 // @route DELETE /api/users/:id
-export const deleteSingleUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase, id: string) => {
+export const deleteSingleUser = async (response: ServerResponse, database: DataBase, id: string) => {
   let outputContent = '';
   let outputStatusCode: number = 0;
   try {
