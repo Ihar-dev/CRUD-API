@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { userType } from '../models/user.model';
 
 export class DataBase {
-  private readonly users: userType[] = [];
+  private users: userType[] = [];
 
   public async getUsers(): Promise < userType[] > {
     return this.users; 
@@ -24,6 +24,14 @@ export class DataBase {
     const user: userType = JSON.parse(JSON.stringify(newUser));
     user.id = this.createId();
     this.users.push(user);
+    return user;
+  }
+
+  public async updateUser(newUser: userType): Promise < userType > {
+    const user: userType = JSON.parse(JSON.stringify(newUser));
+    this.users = this.users.map(el => {
+      return (el.id === user.id) ? user : el;
+    });
     return user;
   }
 

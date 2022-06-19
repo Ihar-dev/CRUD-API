@@ -90,3 +90,50 @@ export const createUser = async (request: IncomingMessage, response: ServerRespo
     sendAnswer(response, outputStatusCode, outputContent);
   }
 }
+
+// @desc Updates a User
+// @route PUT /api/users/:id
+export const updateSingleUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase, id: string) => {
+  let outputContent = '';
+  let outputStatusCode: number = 0;
+  try {
+    let body = '';
+    request.on('data', chunk => body += chunk.toString());
+
+    request.on('end', async () => {
+      if (body) {
+        const { username, age, hobbies } = JSON.parse(body);
+        if (username && age && hobbies && typeof username === 'string' && typeof age === 'number' && Array.isArray(hobbies)) {
+          const newUser = {
+            username,
+            age,
+            hobbies,
+            id,
+          };
+          if (uuidValidate(id)) {
+            const user: userType = await database.findUser(id);
+            if (user.id) {
+              const user: userType = await database.updateUser(newUser);
+              outputContent = JSON.stringify(user);
+              outputStatusCode = 200;
+            } else {
+              outputContent = JSON.stringify({message: USER_ERROR_MESSAGE});
+              outputStatusCode = 404;
+            }
+          } else {
+            outputContent = JSON.stringify({message: UUID_ERROR_MESSAGE});
+            outputStatusCode = 400;
+          }
+        } else {
+          outputContent = JSON.stringify({message: REQUEST_BODY_ERROR_MESSAGE});
+          outputStatusCode = 400;
+        }
+        sendAnswer(response, outputStatusCode, outputContent);
+      }
+    });
+  } catch (err) {
+    outputContent = JSON.stringify({message: SERVER_ERROR_MESSAGE});
+    outputStatusCode = 500;
+    sendAnswer(response, outputStatusCode, outputContent);
+  }
+}
