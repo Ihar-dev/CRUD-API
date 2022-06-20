@@ -1,3 +1,12 @@
+## How to Install The Application:
+"git clone https://github.com/Ihar-dev/CRUD-API.git" or
+
+"git clone git@github.com:Ihar-dev/CRUD-API.git"
+
+then
+
+"npm i"
+
 ## How to Use The Aplication:
 "npm run start:prod" to run the app in production mode with nodemon
 
