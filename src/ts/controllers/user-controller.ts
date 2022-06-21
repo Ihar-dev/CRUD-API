@@ -9,14 +9,14 @@ const REQUEST_BODY_ERROR_MESSAGE = 'Request Body Does Not Contain Required Field
 const UUID_ERROR_MESSAGE = 'UserId Is Invalid (not uuid)';
 const USER_ERROR_MESSAGE = 'UserId Is Not Found';
 
-const sendAnswer = (response: ServerResponse, outputStatusCode: number, outputContent: string) => {
+const sendAnswer = (response: ServerResponse, outputStatusCode: number, outputContent: string): void => {
   response.writeHead(outputStatusCode, {'Content-Type': 'application/json'});
   response.end(outputContent);
 }
 
 // @desc Gets All Users
 // @route GET /api/users
-export const getUsers = async (response: ServerResponse, database: DataBase) => {
+export const getUsers = async (response: ServerResponse, database: DataBase): Promise < void > => {
   let outputContent = '';
   let outputStatusCode: number;
   try {
@@ -32,7 +32,7 @@ export const getUsers = async (response: ServerResponse, database: DataBase) => 
 
 // @desc Gets Single User
 // @route GET /api/users/:id
-export const getSingleUser = async (response: ServerResponse, database: DataBase, id: string) => {
+export const getSingleUser = async (response: ServerResponse, database: DataBase, id: string): Promise < void > => {
   let outputContent = '';
   let outputStatusCode: number = 0;
   try {
@@ -56,18 +56,31 @@ export const getSingleUser = async (response: ServerResponse, database: DataBase
   sendAnswer(response, outputStatusCode, outputContent);
 }
 
+const getBodyData = (request: IncomingMessage): Promise < string > => {
+  return new Promise < string > ((resolve, reject) => {
+    try {
+      let body = '';
+      request.on('data', chunk => body += chunk.toString());
+      request.on('end', () => resolve(body));
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+
 // @desc Create a User
 // @route POST /api/users
-export const createUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase) => {
+export const createUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase): Promise < void > => {
   let outputContent = '';
-  let outputStatusCode: number;
+  let outputStatusCode = 400;
   try {
-    let body = '';
-    request.on('data', chunk => body += chunk.toString());
-
-    request.on('end', async () => {
-      if (body) {
-        const { username, age, hobbies } = JSON.parse(body);
+    const body: string = await getBodyData(request);
+    let falsyBody = true;
+    if (body) {
+      const userObj = JSON.parse(body);
+      if (Object.keys(userObj).length === 3) {
+        const { username, age, hobbies } = userObj;
         if (username && age && hobbies && typeof username === 'string' && typeof age === 'number' && Array.isArray(hobbies)) {
           const newUser = {
             username,
@@ -77,13 +90,12 @@ export const createUser = async (request: IncomingMessage, response: ServerRespo
           const user: userType = await database.createUser(newUser);
           outputContent = JSON.stringify(user);
           outputStatusCode = 201;
-        } else {
-          outputContent = JSON.stringify({message: REQUEST_BODY_ERROR_MESSAGE});
-          outputStatusCode = 400;
+          falsyBody = false;
         }
-        sendAnswer(response, outputStatusCode, outputContent);
       }
-    });
+    }
+    if (falsyBody) outputContent = JSON.stringify({message: REQUEST_BODY_ERROR_MESSAGE});
+    sendAnswer(response, outputStatusCode, outputContent);
   } catch (err) {
     outputContent = JSON.stringify({message: SERVER_ERROR_MESSAGE});
     outputStatusCode = 500;
@@ -93,7 +105,7 @@ export const createUser = async (request: IncomingMessage, response: ServerRespo
 
 // @desc Updates a User
 // @route PUT /api/users/:id
-export const updateSingleUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase, id: string) => {
+export const updateSingleUser = async (request: IncomingMessage, response: ServerResponse, database: DataBase, id: string): Promise < void > => {
   let outputContent = '';
   let outputStatusCode: number = 0;
   try {
@@ -140,7 +152,7 @@ export const updateSingleUser = async (request: IncomingMessage, response: Serve
 
 // @desc Deletes a User
 // @route DELETE /api/users/:id
-export const deleteSingleUser = async (response: ServerResponse, database: DataBase, id: string) => {
+export const deleteSingleUser = async (response: ServerResponse, database: DataBase, id: string): Promise < void > => {
   let outputContent = '';
   let outputStatusCode: number = 0;
   try {

@@ -7,7 +7,7 @@ import { DataBase } from './database/database';
 import { getUsers, createUser, getSingleUser, updateSingleUser, deleteSingleUser } from './controllers/user-controller';
 
 const database = new DataBase(); 
-const PORT = Number(process.env.PORT);
+let PORT = Number(process.env.PORT);
 const HOSTNAME = 'localhost';
 const ROUTE_ERROR_MESSAGE = 'Route Not Found';
  
@@ -34,21 +34,23 @@ const requestHandler = (request: IncomingMessage, response: ServerResponse): voi
   }
 };
 
+const server = createServer(requestHandler);
+
 const runServer = (): void => {
-  const server = createServer(requestHandler);
-  server.listen(PORT, HOSTNAME, () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
-  });
+    server.listen(PORT, HOSTNAME, () => {
+      if (process.env.NODE_ENV !=='test') console.log(`Сервер запущен на порту ${PORT}`);
+    });
 }
 
 if (process.argv.length === 3 && process.argv[2] === 'multi') {
   if (cluster.isPrimary) {
     let cpus = os.cpus();
-    cpus.forEach(() => {
-      const worker = cluster.fork();
+    cpus.forEach((el, index) => {
+      const worker = cluster.fork({WORKER_PORT: 4000 + index + 1});
       worker.send(`Worker id: ${worker.id} launched`);
     });
   } else {
+    if (process.env.WORKER_PORT) PORT = +process.env.WORKER_PORT;
     runServer();
     process.on('message', message => console.log(`Message from master: "${message}"`));
   }
